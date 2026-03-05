@@ -1936,7 +1936,7 @@ fi
 # Ensure all users last password change date is in the past
 echo "[MANUAL] Ensure all users last password change date is in the past"
 MANUAL=$((MANUAL+1))
-fi
+
 echo
 echo "=================================================="
 echo "SYSTEM MAINTENANCE"
