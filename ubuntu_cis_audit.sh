@@ -2064,6 +2064,7 @@ if [ -z "$(df --local -P | awk 'NR!=1 {print $6}' | xargs -I '{}' find '{}' -xde
 else
     echo "[FAIL] Ensure no ungrouped files or directories exist"
     FAIL=$((FAIL+1))
+    fi
 fi
 echo
 echo "=================================================="
