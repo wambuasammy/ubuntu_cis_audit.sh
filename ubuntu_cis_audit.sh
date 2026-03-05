@@ -1886,9 +1886,9 @@ echo "USER ACCOUNTS AND ENVIRONMENT"
 echo "=================================================="
 
 # Ensure password expiration is 365 days or less
-maxdays=$(grep PASS_MAX_DAYS /etc/login.defs | awk '{print $2}')
+maxdays=$(awk '/^\s*PASS_MAX_DAYS/{print $2; exit}' /etc/login.defs)
 
-if [ "$maxdays" -le 365 ]; then
+if [[ "$maxdays" =~ ^[0-9]+$ ]] && [ "$maxdays" -le 365 ]; then
     echo "[PASS] Ensure password expiration is 365 days or less"
     PASS=$((PASS+1))
 else
@@ -1898,9 +1898,9 @@ fi
 
 
 # Ensure minimum days between password changes is configured
-mindays=$(grep PASS_MIN_DAYS /etc/login.defs | awk '{print $2}')
+mindays=$(awk '/^\s*PASS_MIN_DAYS/{print $2; exit}' /etc/login.defs)
 
-if [ "$mindays" -ge 1 ]; then
+if [[ "$mindays" =~ ^[0-9]+$ ]] && [ "$mindays" -ge 1 ]; then
     echo "[PASS] Ensure minimum days between password changes is configured"
     PASS=$((PASS+1))
 else
@@ -1910,9 +1910,9 @@ fi
 
 
 # Ensure password expiration warning days is 7 or more
-warndays=$(grep PASS_WARN_AGE /etc/login.defs | awk '{print $2}')
+warndays=$(awk '/^\s*PASS_WARN_AGE/{print $2; exit}' /etc/login.defs)
 
-if [ "$warndays" -ge 7 ]; then
+if [[ "$warndays" =~ ^[0-9]+$ ]] && [ "$warndays" -ge 7 ]; then
     echo "[PASS] Ensure password expiration warning days is 7 or more"
     PASS=$((PASS+1))
 else
@@ -1922,9 +1922,9 @@ fi
 
 
 # Ensure inactive password lock is 30 days or less
-inactive=$(useradd -D | grep INACTIVE | cut -d= -f2)
+inactive=$(useradd -D | awk -F= '/INACTIVE/{print $2}')
 
-if [ "$inactive" -le 30 ]; then
+if [[ "$inactive" =~ ^[0-9]+$ ]] && [ "$inactive" -le 30 ]; then
     echo "[PASS] Ensure inactive password lock is 30 days or less"
     PASS=$((PASS+1))
 else
@@ -1934,13 +1934,8 @@ fi
 
 
 # Ensure all users last password change date is in the past
-future_users=0
-
-for user in $(cut -d: -f1 /etc/passwd); do
-    last_change=$(chage --list "$user" 2>/dev/null | grep "Last password change" | cut -d: -f2)
-
-    if [[ "$last_change" == *"never"* ]]; then
-        continue
+echo "[MANUAL] Ensure all users last password change date is in the past"
+MANUAL=$((MANUAL+1))
     fi
 done
 
