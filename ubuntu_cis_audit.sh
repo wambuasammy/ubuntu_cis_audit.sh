@@ -1720,7 +1720,7 @@ fi
 
 
 # Ensure only strong Ciphers are used
-if sshd -T | grep -i ciphers | grep -Eq "cbc"; then
+if sshd -T 2>/dev/null | grep -E "^ciphers" | grep -q "cbc"; then
     echo "[FAIL] Ensure only strong Ciphers are used"
     FAIL=$((FAIL+1))
 else
@@ -1730,7 +1730,7 @@ fi
 
 
 # Ensure only strong MAC algorithms are used
-if sshd -T | grep -i macs | grep -E "md5|sha1"; then
+if sshd -T 2>/dev/null | grep -E "^macs" | grep -Eq "hmac-sha1(,|$)|umac-64@"; then
     echo "[FAIL] Ensure only strong MAC algorithms are used"
     FAIL=$((FAIL+1))
 else
@@ -1838,17 +1838,19 @@ echo "CONFIGURE PAM"
 echo "=================================================="
 
 # Ensure password creation requirements are configured
-minlen=$(grep '^\s*minlen' /etc/security/pwquality.conf 2>/dev/null | awk '{print $3}')
-minclass=$(grep '^\s*minclass' /etc/security/pwquality.conf 2>/dev/null | awk '{print $3}')
+minlen=$(grep -E '^\s*minlen' /etc/security/pwquality.conf /etc/security/pwquality.conf.d/* 2>/dev/null | awk '{print $3}' | head -1)
+minclass=$(grep -E '^\s*minclass' /etc/security/pwquality.conf /etc/security/pwquality.conf.d/* 2>/dev/null | awk '{print $3}' | head -1)
 
-if [ "$minlen" -ge 14 ] && [ "$minclass" -ge 4 ]; then
+minlen=${minlen:-0}
+minclass=${minclass:-0}
+
+if [[ "$minlen" =~ ^[0-9]+$ ]] && [[ "$minclass" =~ ^[0-9]+$ ]] && [ "$minlen" -ge 14 ] && [ "$minclass" -ge 4 ]; then
     echo "[PASS] Ensure password creation requirements are configured"
     PASS=$((PASS+1))
 else
     echo "[FAIL] Ensure password creation requirements are configured"
     FAIL=$((FAIL+1))
 fi
-
 
 # Ensure lockout for failed password attempts is configured
 if grep -q "pam_tally2" /etc/pam.d/common-auth 2>/dev/null; then
