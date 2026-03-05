@@ -2318,7 +2318,7 @@ else
     echo "[FAIL] Ensure no ungrouped files or directories exist"
     FAIL=$((FAIL+1))
     fi
-fi
+    
 echo
 echo "=================================================="
 echo "USER AND GROUP SETTINGS"
