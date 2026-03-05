@@ -1593,13 +1593,12 @@ fi
 
 
 # Ensure at is restricted to authorized users
-if [ -f /etc/at.allow ] && [ ! -f /etc/at.deny ]; then
+if [ -f /etc/at.allow ] && [ ! -f /etc/at.deny ] && [ "$(stat -c %a /etc/at.allow)" -le 640 ]; then
     echo "[PASS] Ensure at is restricted to authorized users"
     PASS=$((PASS+1))
 else
     echo "[FAIL] Ensure at is restricted to authorized users"
     FAIL=$((FAIL+1))
-fiecho
 fi
 echo "=================================================="
 echo "SSH SERVER CONFIGURATION"
