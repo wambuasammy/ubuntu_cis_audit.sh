@@ -677,13 +677,11 @@ else
 fi
 
 
-echo
 echo "----------- NONESSENTIAL SERVICES REVIEW --------"
-
 echo "[MANUAL] Ensure nonessential services are removed or masked"
-MANUAL=$((MANUAL+1))
+echo
 
-lsof -i -P -n | grep -v "(ESTABLISHED)"
+ss -tulnp | awk 'NR>1 {split($5,a,":"); split($7,b,"\""); printf "%-6s %s\n", a[length(a)], b[2]}' | sort -u
 echo
 echo "=================================================="
 echo "SECTION C: NETWORK CONFIGURATION"
