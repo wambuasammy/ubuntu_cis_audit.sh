@@ -1936,6 +1936,48 @@ fi
 echo "[MANUAL] Ensure all users last password change date is in the past"
 MANUAL=$((MANUAL+1))
 
+# Ensure system accounts are non-login
+nonlogin=$(awk -F: '($1!="root" && $1!="sync" && $1!="shutdown" && $1!="halt" && $3<1000 && $7!="/usr/sbin/nologin" && $7!="/sbin/nologin" && $7!="/bin/false") {print}' /etc/passwd)
+
+if [ -z "$nonlogin" ]; then
+    echo "[PASS] Ensure system accounts are non-login"
+    PASS=$((PASS+1))
+else
+    echo "[FAIL] Ensure system accounts are non-login"
+    FAIL=$((FAIL+1))
+fi
+
+# Ensure default group for the root account is GID 0
+root_gid=$(grep "^root:" /etc/passwd | cut -d: -f4)
+
+if [ "$root_gid" -eq 0 ]; then
+    echo "[PASS] Ensure default group for the root account is GID 0"
+    PASS=$((PASS+1))
+else
+    echo "[FAIL] Ensure default group for the root account is GID 0"
+    FAIL=$((FAIL+1))
+fi
+
+# Ensure default user umask is 027 or more restrictive
+umask_value=$(grep -R "umask" /etc/profile /etc/bash.bashrc /etc/profile.d/* 2>/dev/null | grep -Eo "umask [0-9]+" | awk '{print $2}' | head -1)
+
+if [[ "$umask_value" =~ ^[0-9]+$ ]] && [ "$umask_value" -le 027 ]; then
+    echo "[PASS] Ensure default user umask is 027 or more restrictive"
+    PASS=$((PASS+1))
+else
+    echo "[FAIL] Ensure default user umask is 027 or more restrictive"
+    FAIL=$((FAIL+1))
+fi
+
+# Ensure access to the su command is restricted
+if grep -Eq "pam_wheel.so.*use_uid" /etc/pam.d/su 2>/dev/null; then
+    echo "[PASS] Ensure access to the su command is restricted"
+    PASS=$((PASS+1))
+else
+    echo "[FAIL] Ensure access to the su command is restricted"
+    FAIL=$((FAIL+1))
+fi
+
 echo
 echo "=================================================="
 echo "SYSTEM MAINTENANCE"
