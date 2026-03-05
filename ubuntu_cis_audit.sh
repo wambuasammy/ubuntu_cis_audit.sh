@@ -1941,6 +1941,266 @@ done
 
 echo "[MANUAL] Ensure all users last password change date is in the past"
 MANUAL=$((MANUAL+1))
+
+fi
+echo
+echo "=================================================="
+echo "SYSTEM MAINTENANCE"
+echo "=================================================="
+
+# Ensure permissions on /etc/passwd are configured
+perm=$(stat -c "%a %u %g" /etc/passwd)
+if [ "$perm" = "644 0 0" ]; then
+    echo "[PASS] Ensure permissions on /etc/passwd are configured"
+    PASS=$((PASS+1))
+else
+    echo "[FAIL] Ensure permissions on /etc/passwd are configured"
+    FAIL=$((FAIL+1))
+fi
+
+
+# Ensure permissions on /etc/shadow are configured
+perm=$(stat -c "%a %u" /etc/shadow)
+if [ "$(stat -c %a /etc/shadow)" -le 640 ] && [ "$(stat -c %u /etc/shadow)" -eq 0 ]; then
+    echo "[PASS] Ensure permissions on /etc/shadow are configured"
+    PASS=$((PASS+1))
+else
+    echo "[FAIL] Ensure permissions on /etc/shadow are configured"
+    FAIL=$((FAIL+1))
+fi
+
+
+# Ensure permissions on /etc/group are configured
+perm=$(stat -c "%a %u %g" /etc/group)
+if [ "$perm" = "644 0 0" ]; then
+    echo "[PASS] Ensure permissions on /etc/group are configured"
+    PASS=$((PASS+1))
+else
+    echo "[FAIL] Ensure permissions on /etc/group are configured"
+    FAIL=$((FAIL+1))
+fi
+
+
+# Ensure permissions on /etc/gshadow are configured
+if [ "$(stat -c %a /etc/gshadow)" -le 640 ]; then
+    echo "[PASS] Ensure permissions on /etc/gshadow are configured"
+    PASS=$((PASS+1))
+else
+    echo "[FAIL] Ensure permissions on /etc/gshadow are configured"
+    FAIL=$((FAIL+1))
+fi
+
+
+# Ensure permissions on /etc/passwd- are configured
+if [ -f /etc/passwd- ]; then
+    if [ "$(stat -c %a /etc/passwd-)" -le 644 ]; then
+        echo "[PASS] Ensure permissions on /etc/passwd- are configured"
+        PASS=$((PASS+1))
+    else
+        echo "[FAIL] Ensure permissions on /etc/passwd- are configured"
+        FAIL=$((FAIL+1))
+    fi
+fi
+
+
+# Ensure permissions on /etc/shadow- are configured
+if [ -f /etc/shadow- ]; then
+    if [ "$(stat -c %a /etc/shadow-)" -le 640 ]; then
+        echo "[PASS] Ensure permissions on /etc/shadow- are configured"
+        PASS=$((PASS+1))
+    else
+        echo "[FAIL] Ensure permissions on /etc/shadow- are configured"
+        FAIL=$((FAIL+1))
+    fi
+fi
+
+
+# Ensure permissions on /etc/group- are configured
+if [ -f /etc/group- ]; then
+    if [ "$(stat -c %a /etc/group-)" -le 644 ]; then
+        echo "[PASS] Ensure permissions on /etc/group- are configured"
+        PASS=$((PASS+1))
+    else
+        echo "[FAIL] Ensure permissions on /etc/group- are configured"
+        FAIL=$((FAIL+1))
+    fi
+fi
+
+
+# Ensure permissions on /etc/gshadow- are configured
+if [ -f /etc/gshadow- ]; then
+    if [ "$(stat -c %a /etc/gshadow-)" -le 640 ]; then
+        echo "[PASS] Ensure permissions on /etc/gshadow- are configured"
+        PASS=$((PASS+1))
+    else
+        echo "[FAIL] Ensure permissions on /etc/gshadow- are configured"
+        FAIL=$((FAIL+1))
+    fi
+fi
+
+
+# Ensure no world writable files exist
+if [ -z "$(df --local -P | awk 'NR!=1 {print $6}' | xargs -I '{}' find '{}' -xdev -type f -perm -0002 2>/dev/null)" ]; then
+    echo "[PASS] Ensure no world writable files exist"
+    PASS=$((PASS+1))
+else
+    echo "[FAIL] Ensure no world writable files exist"
+    FAIL=$((FAIL+1))
+fi
+
+
+# Ensure no unowned files exist
+if [ -z "$(df --local -P | awk 'NR!=1 {print $6}' | xargs -I '{}' find '{}' -xdev -nouser 2>/dev/null)" ]; then
+    echo "[PASS] Ensure no unowned files or directories exist"
+    PASS=$((PASS+1))
+else
+    echo "[FAIL] Ensure no unowned files or directories exist"
+    FAIL=$((FAIL+1))
+fi
+
+
+# Ensure no ungrouped files exist
+if [ -z "$(df --local -P | awk 'NR!=1 {print $6}' | xargs -I '{}' find '{}' -xdev -nogroup 2>/dev/null)" ]; then
+    echo "[PASS] Ensure no ungrouped files or directories exist"
+    PASS=$((PASS+1))
+else
+    echo "[FAIL] Ensure no ungrouped files or directories exist"
+    FAIL=$((FAIL+1))
+    fi
+fi
+echo
+echo "=================================================="
+echo "USER AND GROUP SETTINGS"
+echo "=================================================="
+
+# Ensure password fields are not empty
+if [ -z "$(awk -F: '($2 == "") {print $1}' /etc/shadow)" ]; then
+    echo "[PASS] Ensure password fields are not empty"
+    PASS=$((PASS+1))
+else
+    echo "[FAIL] Ensure password fields are not empty"
+    FAIL=$((FAIL+1))
+fi
+
+
+# Ensure no legacy '+' entries exist in /etc/passwd
+if ! grep -q '^\+:' /etc/passwd; then
+    echo "[PASS] Ensure no legacy '+' entries exist in /etc/passwd"
+    PASS=$((PASS+1))
+else
+    echo "[FAIL] Ensure no legacy '+' entries exist in /etc/passwd"
+    FAIL=$((FAIL+1))
+fi
+
+
+# Ensure no legacy '+' entries exist in /etc/shadow
+if ! grep -q '^\+:' /etc/shadow; then
+    echo "[PASS] Ensure no legacy '+' entries exist in /etc/shadow"
+    PASS=$((PASS+1))
+else
+    echo "[FAIL] Ensure no legacy '+' entries exist in /etc/shadow"
+    FAIL=$((FAIL+1))
+fi
+
+
+# Ensure no legacy '+' entries exist in /etc/group
+if ! grep -q '^\+:' /etc/group; then
+    echo "[PASS] Ensure no legacy '+' entries exist in /etc/group"
+    PASS=$((PASS+1))
+else
+    echo "[FAIL] Ensure no legacy '+' entries exist in /etc/group"
+    FAIL=$((FAIL+1))
+fi
+
+
+# Ensure root is the only UID 0 account
+if [ "$(awk -F: '($3 == 0) {print $1}' /etc/passwd | wc -l)" -eq 1 ]; then
+    echo "[PASS] Ensure root is the only UID 0 account"
+    PASS=$((PASS+1))
+else
+    echo "[FAIL] Ensure root is the only UID 0 account"
+    FAIL=$((FAIL+1))
+fi
+
+
+# Ensure root PATH Integrity
+badpath=0
+
+echo $PATH | grep "::" >/dev/null && badpath=1
+echo $PATH | grep ":$" >/dev/null && badpath=1
+
+for dir in $(echo $PATH | tr ":" " "); do
+    [ "$dir" = "." ] && badpath=1
+done
+
+if [ "$badpath" -eq 0 ]; then
+    echo "[PASS] Ensure root PATH Integrity"
+    PASS=$((PASS+1))
+else
+    echo "[FAIL] Ensure root PATH Integrity"
+    FAIL=$((FAIL+1))
+fifi
+echo
+echo "=================================================="
+echo "USER ACCOUNTS AND ENVIRONMENT"
+echo "=================================================="
+
+# Ensure password expiration is 365 days or less
+maxdays=$(awk '/^\s*PASS_MAX_DAYS/{print $2; exit}' /etc/login.defs)
+
+if [[ "$maxdays" =~ ^[0-9]+$ ]] && [ "$maxdays" -le 365 ]; then
+    echo "[PASS] Ensure password expiration is 365 days or less"
+    PASS=$((PASS+1))
+else
+    echo "[FAIL] Ensure password expiration is 365 days or less"
+    FAIL=$((FAIL+1))
+fi
+
+
+# Ensure minimum days between password changes is configured
+mindays=$(awk '/^\s*PASS_MIN_DAYS/{print $2; exit}' /etc/login.defs)
+
+if [[ "$mindays" =~ ^[0-9]+$ ]] && [ "$mindays" -ge 1 ]; then
+    echo "[PASS] Ensure minimum days between password changes is configured"
+    PASS=$((PASS+1))
+else
+    echo "[FAIL] Ensure minimum days between password changes is configured"
+    FAIL=$((FAIL+1))
+fi
+
+
+# Ensure password expiration warning days is 7 or more
+warndays=$(awk '/^\s*PASS_WARN_AGE/{print $2; exit}' /etc/login.defs)
+
+if [[ "$warndays" =~ ^[0-9]+$ ]] && [ "$warndays" -ge 7 ]; then
+    echo "[PASS] Ensure password expiration warning days is 7 or more"
+    PASS=$((PASS+1))
+else
+    echo "[FAIL] Ensure password expiration warning days is 7 or more"
+    FAIL=$((FAIL+1))
+fi
+
+
+# Ensure inactive password lock is 30 days or less
+inactive=$(useradd -D | awk -F= '/INACTIVE/{print $2}')
+
+if [[ "$inactive" =~ ^[0-9]+$ ]] && [ "$inactive" -le 30 ]; then
+    echo "[PASS] Ensure inactive password lock is 30 days or less"
+    PASS=$((PASS+1))
+else
+    echo "[FAIL] Ensure inactive password lock is 30 days or less"
+    FAIL=$((FAIL+1))
+fi
+
+
+# Ensure all users last password change date is in the past
+echo "[MANUAL] Ensure all users last password change date is in the past"
+MANUAL=$((MANUAL+1))
+    fi
+done
+
+echo "[MANUAL] Ensure all users last password change date is in the past"
+MANUAL=$((MANUAL+1))
 echo
 echo "=================================================="
 echo "SYSTEM MAINTENANCE"
