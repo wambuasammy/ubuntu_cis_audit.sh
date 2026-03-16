@@ -14,3 +14,12 @@ if apt-key list 2>/dev/null | grep -q pub; then
 else
     fail "Ensure GPG keys are configured"
 fi
+
+
+if apt-get -s upgrade 2>/dev/null | grep -q "0 upgraded"; then
+    echo "[PASS] Ensure updates, patches, and additional security software are installed"
+    PASS=$((PASS+1))
+else
+    echo "[FAIL] Ensure updates, patches, and additional security software are installed"
+    FAIL=$((FAIL+1))
+fi
