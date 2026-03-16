@@ -505,110 +505,13 @@ else
         FAIL=$((FAIL+1))
     fi
 fi
-echo
-echo "=================================================="
-echo "SECTION B: SERVICES"
-echo "=================================================="
-
-echo
-echo "---------------- INETD SERVICES ----------------"
-
-# Ensure xinetd is not installed
-if ! dpkg -s xinetd >/dev/null 2>&1; then
-    echo "[PASS] Ensure xinetd is not installed"
-    PASS=$((PASS+1))
-else
-    echo "[FAIL] Ensure xinetd is not installed"
-    FAIL=$((FAIL+1))
-fi
-
-# Ensure openbsd-inetd is not installed
-if ! dpkg -s openbsd-inetd >/dev/null 2>&1; then
-    echo "[PASS] Ensure openbsd-inetd is not installed"
-    PASS=$((PASS+1))
-else
-    echo "[FAIL] Ensure openbsd-inetd is not installed"
-    FAIL=$((FAIL+1))
-fi
 
 
-echo
-echo "------------- TIME SYNCHRONIZATION -------------"
+print_section "SECTION B: SERVICES"
 
-# Ensure time synchronization is in use
-if systemctl is-enabled systemd-timesyncd >/dev/null 2>&1 || \
-   dpkg -s chrony >/dev/null 2>&1 || \
-   dpkg -s ntp >/dev/null 2>&1; then
-    echo "[PASS] Ensure time synchronization is in use"
-    PASS=$((PASS+1))
-else
-    echo "[FAIL] Ensure time synchronization is in use"
-    FAIL=$((FAIL+1))
-fi
+source modules/services_checks.sh
 
 
-echo
-echo "----------- SPECIAL PURPOSE SERVICES -----------"
-
-check_pkg_absent () {
-    pkg=$1
-    desc=$2
-
-    if ! dpkg -s "$pkg" >/dev/null 2>&1; then
-        echo "[PASS] $desc"
-        PASS=$((PASS+1))
-    else
-        echo "[FAIL] $desc"
-        FAIL=$((FAIL+1))
-    fi
-}
-
-check_pkg_absent xserver-xorg "Ensure X Window System is not installed"
-check_pkg_absent avahi-daemon "Ensure Avahi Server is not installed"
-check_pkg_absent cups "Ensure CUPS is not installed"
-check_pkg_absent isc-dhcp-server "Ensure DHCP Server is not installed"
-check_pkg_absent slapd "Ensure LDAP server is not installed"
-check_pkg_absent nfs-kernel-server "Ensure NFS is not installed"
-check_pkg_absent bind9 "Ensure DNS Server is not installed"
-check_pkg_absent vsftpd "Ensure FTP Server is not installed"
-check_pkg_absent apache2 "Ensure HTTP server is not installed"
-check_pkg_absent dovecot-imapd "Ensure IMAP server is not installed"
-check_pkg_absent dovecot-pop3d "Ensure POP3 server is not installed"
-check_pkg_absent samba "Ensure Samba is not installed"
-check_pkg_absent squid "Ensure HTTP Proxy Server is not installed"
-check_pkg_absent snmpd "Ensure SNMP Server is not installed"
-check_pkg_absent rsync "Ensure rsync service is not installed"
-check_pkg_absent nis "Ensure NIS Server is not installed"
-
-
-echo
-echo "--------------- SERVICE CLIENTS ----------------"
-
-check_pkg_absent nis "Ensure NIS Client is not installed"
-check_pkg_absent rsh-client "Ensure rsh client is not installed"
-check_pkg_absent talk "Ensure talk client is not installed"
-check_pkg_absent telnet "Ensure telnet client is not installed"
-check_pkg_absent ldap-utils "Ensure LDAP client is not installed"
-check_pkg_absent rpcbind "Ensure RPC is not installed"
-
-
-echo
-echo "------------- MAIL TRANSFER AGENT --------------"
-
-if ss -lntu | grep ':25 ' | grep -vE '(127.0.0.1|::1)' >/dev/null; then
-    echo "[FAIL] Ensure mail transfer agent is configured for local-only mode"
-    FAIL=$((FAIL+1))
-else
-    echo "[PASS] Ensure mail transfer agent is configured for local-only mode"
-    PASS=$((PASS+1))
-fi
-
-
-echo "----------- NONESSENTIAL SERVICES REVIEW --------"
-echo "[MANUAL] Ensure nonessential services are removed or masked"
-echo
-
-ss -tulnp | awk 'NR>1 {split($5,a,":"); split($7,b,"\""); printf "%-6s %s\n", a[length(a)], b[2]}' | sort -u
 echo
 echo "=================================================="
 echo "SECTION C: NETWORK CONFIGURATION"
