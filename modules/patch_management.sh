@@ -1,11 +1,9 @@
-##################################################
-# PATCH MANAGEMENT
-##################################################
+print_subsection "PATCH MANAGEMENT"
 
-# Ensure updates, patches, and additional security software are installed
-
-if apt -s upgrade 2>/dev/null | grep -q "0 upgraded"; then
-    pass "Ensure updates, patches, and additional security software are installed"
+if apt-get -s upgrade 2>/dev/null | grep -q "0 upgraded"; then
+    echo "[PASS] Ensure updates, patches, and additional security software are installed"
+    PASS=$((PASS+1))
 else
-    fail "Ensure updates, patches, and additional security software are installed"
+    echo "[FAIL] Ensure updates, patches, and additional security software are installed"
+    FAIL=$((FAIL+1))
 fi
