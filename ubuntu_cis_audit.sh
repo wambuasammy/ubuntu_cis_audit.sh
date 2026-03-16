@@ -24,6 +24,43 @@
 #
 ############################################################
 
+print_section() {
+
+echo
+echo "=================================================="
+echo "$1"
+echo "=================================================="
+
+}
+
+pass() {
+echo "[PASS] $1"
+PASS=$((PASS+1))
+TOTAL=$((TOTAL+1))
+}
+
+fail() {
+echo "[FAIL] $1"
+FAIL=$((FAIL+1))
+TOTAL=$((TOTAL+1))
+}
+
+manual() {
+echo "[MANUAL] $1"
+MANUAL=$((MANUAL+1))
+TOTAL=$((TOTAL+1))
+}
+
+warn() {
+echo "[WARNING] $1"
+WARN=$((WARN+1))
+TOTAL=$((TOTAL+1))
+}
+
+for module in modules/*.sh; do
+    source "$module"
+done
+
 
 echo
 echo "=================================================="
@@ -284,84 +321,16 @@ else
     echo "[FAIL] Disable USB storage"
     ((FAIL++))
 fi
-echo
-echo "=================================================="
-echo "CONFIGURE SOFTWARE UPDATES"
-echo "=================================================="
 
-# 1.2.1 Ensure package manager repositories are configured
-if apt-cache policy 2>/dev/null | grep -q "http"; then
-    echo "[PASS] Ensure package manager repositories are configured"
-    ((PASS++))
-else
-    echo "[FAIL] Ensure package manager repositories are configured"
-    ((FAIL++))
-fi
 
-# 1.2.2 Ensure GPG keys are configured
-if apt-key list 2>/dev/null | grep -q "pub"; then
-    echo "[PASS] Ensure GPG keys are configured"
-    ((PASS++))
-else
-    echo "[FAIL] Ensure GPG keys are configured"
-    ((FAIL++))
-fi
-echo
-echo "=================================================="
-echo "CONFIGURE SUDO"
-echo "=================================================="
+print_section "CONFIGURE SOFTWARE UPDATES"
 
-# 1.3.1 Ensure sudo is installed
-if dpkg -s sudo >/dev/null 2>&1 || dpkg -s sudo-ldap >/dev/null 2>&1; then
-    echo "[PASS] Ensure sudo is installed"
-    ((PASS++))
-else
-    echo "[FAIL] Ensure sudo is installed"
-    ((FAIL++))
-fi
+source modules/software_updates.sh
 
-# 1.3.2 Ensure sudo commands use pty
-if grep -Ei '^\s*Defaults\s+([^#]+,\s*)?use_pty(,\s+\S+\s*)*(\s+#.*)?$' /etc/sudoers /etc/sudoers.d/* >/dev/null 2>&1; then
-    echo "[PASS] Ensure sudo commands use pty"
-    ((PASS++))
-else
-    echo "[FAIL] Ensure sudo commands use pty"
-    ((FAIL++))
-fi
 
-# 1.3.3 Ensure sudo log file exists
-if grep -Ei '^\s*Defaults\s+logfile=\S+' /etc/sudoers /etc/sudoers.d/* >/dev/null 2>&1; then
-    echo "[PASS] Ensure sudo log file exists"
-    ((PASS++))
-else
-    echo "[FAIL] Ensure sudo log file exists"
-    ((FAIL++))
-fi
-echo
-echo "=================================================="
-echo "FILESYSTEM INTEGRITY CHECKING"
-echo "=================================================="
+print_section "FILESYSTEM INTEGRITY CHECKING"
 
-# 1.4.1 Ensure AIDE is installed
-if dpkg -s aide 2>/dev/null | grep -q "Status: install ok installed" && \
-   dpkg -s aide-common 2>/dev/null | grep -q "Status: install ok installed"; then
-    echo "[PASS] Ensure AIDE is installed"
-    PASS=$((PASS+1))
-else
-    echo "[FAIL] Ensure AIDE is installed"
-    FAIL=$((FAIL+1))
-fi
-
-# 1.4.2 Ensure filesystem integrity is regularly checked
-if crontab -u root -l 2>/dev/null | grep -q aide || \
-   find /etc/cron.* /etc/crontab -type f -name "*aide*" 2>/dev/null | grep -q aide || \
-   systemctl is-enabled aidecheck.timer 2>/dev/null | grep -q enabled; then
-    echo "[PASS] Ensure filesystem integrity is regularly checked"
-    PASS=$((PASS+1))
-else
-    echo "[FAIL] Ensure filesystem integrity is regularly checked"
-    FAIL=$((FAIL+1))
-fi
+source modules/filesystem_integrity.sh
 
 
 echo
@@ -542,22 +511,13 @@ if stat -c "%a %U %G" /etc/issue.net | grep -q "644 root root"; then
 else
     echo "[FAIL] Ensure permissions on /etc/issue.net are configured"
     FAIL=$((FAIL+1))
+
 fi
 
 
-echo
-echo "=================================================="
-echo "PATCH MANAGEMENT"
-echo "=================================================="
+print_section "PATCH MANAGEMENT"
 
-# Ensure updates, patches, and additional security software are installed
-if apt-get -s upgrade | grep -q "0 upgraded"; then
-    echo "[PASS] Ensure updates, patches, and additional security software are installed"
-    PASS=$((PASS+1))
-else
-    echo "[FAIL] Ensure updates, patches, and additional security software are installed"
-    FAIL=$((FAIL+1))
-fi
+source modules/patch_management.sh
 
 
 echo
