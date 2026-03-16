@@ -333,42 +333,9 @@ print_section "FILESYSTEM INTEGRITY CHECKING"
 source modules/filesystem_integrity.sh
 
 
-echo
-echo "=================================================="
-echo "SECURE BOOT SETTINGS"
-echo "=================================================="
+print_section "SECURE BOOT SETTINGS"
 
-# 1.5.1 Ensure bootloader password is set
-if grep -q "^set superusers" /boot/grub/grub.cfg 2>/dev/null && \
-   grep -q "^password_pbkdf2" /boot/grub/grub.cfg 2>/dev/null; then
-    echo "[PASS] Ensure bootloader password is set"
-    PASS=$((PASS+1))
-else
-    echo "[FAIL] Ensure bootloader password is set"
-    FAIL=$((FAIL+1))
-fi
-
-# 1.5.2 Ensure permissions on bootloader config are configured
-perm=$(stat -c "%a" /boot/grub/grub.cfg 2>/dev/null)
-owner=$(stat -c "%U" /boot/grub/grub.cfg 2>/dev/null)
-
-if [[ "$perm" -le 400 && "$owner" == "root" ]]; then
-    echo "[PASS] Ensure permissions on bootloader config are configured"
-    PASS=$((PASS+1))
-else
-    echo "[FAIL] Ensure permissions on bootloader config are configured"
-    FAIL=$((FAIL+1))
-fi
-
-# 1.5.3 Ensure authentication required for single user mode
-if grep '^root:' /etc/shadow | grep -vq '^[^:]*:[!*]'; then
-    echo "[PASS] Ensure authentication required for single user mode"
-    PASS=$((PASS+1))
-else
-    echo "[FAIL] Ensure authentication required for single user mode"
-    FAIL=$((FAIL+1))
-fi
-
+source modules/secure_boot_checks.sh
 
 echo
 echo "=================================================="
