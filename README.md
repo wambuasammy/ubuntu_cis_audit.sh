@@ -1,36 +1,39 @@
 # Ubuntu CIS Audit
 
-Lightweight Bash-based security audit tool for Ubuntu systems.  
-Validates system configuration against **CIS-style Linux hardening controls** and reports **PASS / FAIL / MANUAL** results with a final compliance score.
+Bash-based CIS-style compliance auditing engine for Ubuntu.
 
-**Author:** Sammy Wambua
+## What changed
 
----
+This version introduces a **structured classification model** for checks:
 
-## What it checks
+- `TOPIC`
+- `SUBTOPIC`
 
-- Patch management
-- System services
-- Network configuration
-- Logging and auditing
-- SSH configuration
-- Authentication & PAM policies
-- User account security
-- System file permissions
+Runtime output now uses:
 
----
+- `TOPIC -> SUBTOPIC -> CHECK`
 
-## Supported systems
+Example output label:
 
-- Ubuntu 20.04
-- Ubuntu 22.04
-- Ubuntu 24.04
+- `[PASS] [Filesystem/Core] Ensure mounting of cramfs filesystems is disabled`
 
----
+## Why this matters
+
+- Better organization for large rule sets
+- More searchable output artifacts
+- Prepares the engine for future filtering (e.g. `--topic`, `--subtopic`)
+- Backward-compatible scoring and summaries
 
 ## Run
 
 ```bash
-git clone https://github.com/wambuasammy/ubuntu_cis_audit.sh.git
-cd ubuntu_cis_audit.sh
 sudo bash ubuntu_cis_audit.sh
+```
+
+## Options
+
+```bash
+bash ubuntu_cis_audit.sh --help
+bash ubuntu_cis_audit.sh --output ./my-audit.log
+bash ubuntu_cis_audit.sh --quiet
+```
