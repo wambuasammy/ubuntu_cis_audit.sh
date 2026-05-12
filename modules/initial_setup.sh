@@ -1,0 +1,34 @@
+#!/bin/bash
+
+run_module_initial_setup() {
+  check_1_1_1_1
+  check_1_1_1_2
+  check_1_1_1_3
+  check_1_1_1_4
+  check_1_1_1_5
+  check_1_1_1_6
+  check_1_1_1_7
+  check_1_1_2
+  check_1_1_3
+  check_1_1_4
+  check_1_1_5
+  check_1_1_6
+  check_1_1_7
+  check_1_1_8
+  check_1_1_9
+  check_1_1_10
+  check_1_1_11
+  check_1_1_12
+  check_1_1_13
+  check_1_1_14
+  check_1_1_15
+  check_1_1_16
+  check_1_1_17
+  check_1_1_18
+  check_1_1_19
+  check_1_1_20
+  check_1_1_21
+  check_1_1_22
+  check_1_1_23
+  check_1_1_24
+}

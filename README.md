@@ -1,36 +1,56 @@
-# Ubuntu CIS Audit
+# Ubuntu CIS Compliance Auditing Framework (Bash)
 
-Lightweight Bash-based security audit tool for Ubuntu systems.  
-Validates system configuration against **CIS-style Linux hardening controls** and reports **PASS / FAIL / MANUAL** results with a final compliance score.
+Modular, Bash-based Ubuntu CIS auditing framework with deterministic checks and structured multi-format reporting.
 
-**Author:** Sammy Wambua
+## Architecture
 
----
+- `core/` framework engine helpers, reporting backends, and scoring engine
+- `checks/` atomic CIS checks as standardized `check_*` functions
+- `modules/` logical CIS group execution
+- `reports/` generated TXT/CSV/JSON artifacts
+- `ubuntu_cis_audit.sh` main execution entrypoint
 
-## What it checks
+## Check schema
 
-- Patch management
-- System services
-- Network configuration
-- Logging and auditing
-- SSH configuration
-- Authentication & PAM policies
-- User account security
-- System file permissions
+Each check function defines:
 
----
+- `SECTION`
+- `SUBSECTION`
+- `CONTROL`
+- `CHECK_ID`
+- `CHECK_NAME`
+- `DESCRIPTION`
+- `RATIONALE`
+- `AUDIT`
+- `RECOMMENDATION`
+- `REMEDIATION`
 
-## Supported systems
+## Implemented checks
 
-- Ubuntu 20.04
-- Ubuntu 22.04
-- Ubuntu 24.04
+The framework currently implements the pasted initial setup checklist through `1.10` and the services checklist through `2.4`, including inetd services, time synchronization, special-purpose server package removal checks, local-only MTA validation, service client removal checks, and nonessential service review.
 
----
+## Reporting
+
+The framework writes three report formats per run:
+
+- Structured TXT (`.txt`)
+- Group-ready CSV (`.csv`)
+- Machine-readable JSON (`.json`)
 
 ## Run
 
 ```bash
-git clone https://github.com/wambuasammy/ubuntu_cis_audit.sh.git
-cd ubuntu_cis_audit.sh
-sudo bash ubuntu_cis_audit.sh
+bash ubuntu_cis_audit.sh
+```
+
+Reports are written to `reports/` with UTC timestamps.
+
+
+## Scoring engine
+
+`core/scoring.sh` computes weighted compliance and qualitative score banding.
+
+- PASS = 1.0
+- WARNING = 0.5
+- MANUAL = 0.5
+- FAIL = 0.0

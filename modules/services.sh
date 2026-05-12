@@ -1,0 +1,33 @@
+#!/bin/bash
+
+run_module_services() {
+  check_2_1_1
+  check_2_1_2
+  check_2_2_1_1
+  check_2_2_1_2
+  check_2_2_1_3
+  check_2_2_1_4
+  check_2_2_2
+  check_2_2_3
+  check_2_2_4
+  check_2_2_5
+  check_2_2_6
+  check_2_2_7
+  check_2_2_8
+  check_2_2_9
+  check_2_2_10
+  check_2_2_11
+  check_2_2_12
+  check_2_2_13
+  check_2_2_14
+  check_2_2_15
+  check_2_2_16
+  check_2_2_17
+  check_2_3_1
+  check_2_3_2
+  check_2_3_3
+  check_2_3_4
+  check_2_3_5
+  check_2_3_6
+  check_2_4
+}
