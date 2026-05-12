@@ -20,14 +20,6 @@ source "$SCRIPT_DIR/checks/08_warning_banners.sh"
 source "$SCRIPT_DIR/checks/09_updates_gdm.sh"
 source "$SCRIPT_DIR/checks/10_services.sh"
 source "$SCRIPT_DIR/modules/initial_setup.sh"
-source "$SCRIPT_DIR/modules/software_updates.sh"
-source "$SCRIPT_DIR/modules/sudo.sh"
-source "$SCRIPT_DIR/modules/file_integrity.sh"
-source "$SCRIPT_DIR/modules/secure_boot.sh"
-source "$SCRIPT_DIR/modules/process_hardening.sh"
-source "$SCRIPT_DIR/modules/apparmor.sh"
-source "$SCRIPT_DIR/modules/warning_banners.sh"
-source "$SCRIPT_DIR/modules/updates_gdm.sh"
 source "$SCRIPT_DIR/modules/services.sh"
 
 mkdir -p "$REPORT_DIR"
@@ -36,14 +28,6 @@ CSV_REPORT="$REPORT_DIR/cis-audit-$TIMESTAMP.csv"
 JSON_REPORT="$REPORT_DIR/cis-audit-$TIMESTAMP.json"
 
 run_module_initial_setup
-run_module_software_updates
-run_module_sudo
-run_module_file_integrity
-run_module_secure_boot
-run_module_process_hardening
-run_module_apparmor
-run_module_warning_banners
-run_module_updates_gdm
 run_module_services
 
 TOTAL=$((PASS + FAIL + WARNING + MANUAL))

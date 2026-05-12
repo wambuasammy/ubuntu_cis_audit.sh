@@ -6,7 +6,7 @@ Modular, Bash-based Ubuntu CIS auditing framework with deterministic checks and 
 
 - `core/` framework engine helpers, reporting backends, and scoring engine
 - `checks/` atomic CIS checks as standardized `check_*` functions
-- `modules/` logical CIS group execution
+- `modules/` top-level CIS section runners (`initial_setup.sh` for Section 1 and `services.sh` for Section 2)
 - `reports/` generated TXT/CSV/JSON artifacts
 - `ubuntu_cis_audit.sh` main execution entrypoint
 
